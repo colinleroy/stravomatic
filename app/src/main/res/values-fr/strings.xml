@@ -12,4 +12,6 @@
     <string name="pref_summary_enable_bike_detection">Démarrer Strava automatiquement pour les sorties à vélo</string>
     <string name="pref_summary_detection_interval">Vérifier le mouvement toutes les %s minutes</string>
     <string name="detection_started">Détection active</string>
+    <string name="pref_title_detection_threshold">Fiabilité de détection</string>
+    <string name="pref_summary_detection_threshold">Démarrer une activité si la détection est fiable à plus de %s</string>
 </resources>

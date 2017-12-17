@@ -18,4 +18,11 @@
         <item>120</item>
         <item>240</item>
     </string-array>
+    <string-array name="detection_threshold_entries">
+        <item>60%</item>
+        <item>75%</item>
+        <item>85%</item>
+        <item>90%</item>
+        <item>95%</item>
+    </string-array>
 </resources>

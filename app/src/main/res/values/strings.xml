@@ -8,6 +8,8 @@
     <string name="pref_summary_detection_interval">Check for movement every %s minutes</string>
     <string name="pref_title_stop_timeout">Stop activity timeout</string>
     <string name="pref_summary_stop_timeout">Stop Strava activity after %s minutes with no movement</string>
+    <string name="pref_title_detection_threshold">Detection threshold</string>
+    <string name="pref_summary_detection_threshold">Start activity if the detection is more than %s accurate</string>
     <string name="pref_title_vibrate">Vibration</string>
     <string name="pref_summary_vibrate">Vibrate when starting or stopping Strava</string>
     <string name="detection_started">Detection enabled</string>

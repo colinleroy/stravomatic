@@ -51,8 +51,8 @@ public class MainActivity extends PreferenceActivity  {
                     if (key.equals("enable_bike_detection") || key.equals("enable_run_detection")) {
                         setupAlarm(mContext);
                     }
-                    if (key.equals("detection_interval")) {
-                        LogUtils.i(MainActivity.LOG_TAG, "Updating detection interval");
+                    if (key.equals("detection_interval") || key.equals("detection_threshold")) {
+                        LogUtils.i(MainActivity.LOG_TAG, "Updating detection parameters");
                         rescheduleAlarm(mContext);
                     }
                 }
@@ -234,6 +234,18 @@ public class MainActivity extends PreferenceActivity  {
     public static boolean getBoolPreference(Context c, String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         return prefs.getBoolean(key, false);
+    }
+    public static int getPercentPreference(Context c, String key) {
+        String s = getStringPreference(c, key);
+        if (s.indexOf('%') > -1) {
+            s = s.substring(0, s.indexOf('%'));
+        }
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            LogUtils.e(LOG_TAG, "can't parse " + s + " to int");
+        }
+        return -1;
     }
 
 }

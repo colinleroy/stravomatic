@@ -43,9 +43,11 @@ public class MovementDetectorService extends IntentService	 {
         boolean bicycling = false;
         boolean running = false;
 
+        int threshold = MainActivity.getPercentPreference(this, "detection_threshold");
+
         for (DetectedActivity result : probableActivities) {
             Log.i(MainActivity.LOG_TAG, getType(result.getType()) +"\t" + result.getConfidence());
-            if( result.getConfidence() >= 75 ) {
+            if( result.getConfidence() >= threshold ) {
                 switch(result.getType()) {
                     case DetectedActivity.ON_BICYCLE:
                         bicycling = true;
@@ -99,7 +101,7 @@ public class MovementDetectorService extends IntentService	 {
             }
         }
 
-        LogUtils.i(MainActivity.LOG_TAG, "currently: " + status);
+        LogUtils.i(MainActivity.LOG_TAG, "currently: " + status + " (detection threshold " + threshold+")");
     }
 
     private void vibrate() {
