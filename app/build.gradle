@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        standard {
+            keyAlias 'key0'
+            storeFile file('/home/colin/Android/keystore.jks')
+        }
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "net.colino.stravaautostartstop"
@@ -9,7 +15,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary= true
+        vectorDrawables.useSupportLibrary = true
+        signingConfig signingConfigs.standard
     }
     buildTypes {
         release {
@@ -17,10 +24,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    flavorDimensions "standard"
+
+    productFlavors {
+        standard {
+            minSdkVersion 21
+            applicationId 'net.colino.stravaautostartstop'
+            signingConfig signingConfigs.standard
+            targetSdkVersion 26
+            testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+            versionCode 1
+            versionName '1.0'
+            dimension 'standard'
+        }
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
     implementation 'com.android.support:support-vector-drawable:26.1.0'
