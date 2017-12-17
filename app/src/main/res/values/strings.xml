@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Strava Auto Start Stop</string>
+    <string name="pref_title_enable_bike_detection">Bicycling detection</string>
+    <string name="pref_summary_enable_bike_detection">Automatically start Strava activities if bicycling is detected</string>
+    <string name="pref_title_enable_run_detection">Running detection</string>
+    <string name="pref_summary_enable_run_detection">Automatically start Strava activities if running is detected</string>
+    <string name="pref_title_detection_interval">Detection interval</string>
+    <string name="pref_summary_detection_interval">Check for movement every %s minutes</string>
+    <string name="pref_title_stop_timeout">Stop activity timeout</string>
+    <string name="pref_summary_stop_timeout">Stop Strava activity after %s minutes with no movement</string>
+    <string name="pref_title_vibrate">Vibration</string>
+    <string name="pref_summary_vibrate">Vibrate when starting or stopping Strava</string>
+    <string name="detection_started">Detection enabled</string>
+</resources>
