@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.util.Log;
 
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class MovementDetectorService extends IntentService	 {
         int threshold = MainActivity.getIntPreference(this, "_detection_threshold");
 
         for (DetectedActivity result : probableActivities) {
-            Log.i(MainActivity.LOG_TAG, getType(result.getType()) +"\t" + result.getConfidence());
+            LogUtils.i(MainActivity.LOG_TAG, getType(result.getType()) +"\t" + result.getConfidence());
             if( result.getConfidence() >= threshold ) {
                 switch(result.getType()) {
                     case DetectedActivity.ON_BICYCLE:
@@ -70,10 +69,10 @@ public class MovementDetectorService extends IntentService	 {
         }
 
         String status;
-        if (bicycling && MainActivity.getBoolPreference(this, "enable_bike_detection")) {
+        if (bicycling && MainActivity.getBoolPreference(this, "enable_bike_detection", true)) {
             shouldStart = true;
             status = "Bicycling : ";
-        } else if (running && MainActivity.getBoolPreference(this, "enable_run_detection")) {
+        } else if (running && MainActivity.getBoolPreference(this, "enable_run_detection", true)) {
             shouldStart = true;
             status = "Running : ";
         } else {
@@ -105,7 +104,7 @@ public class MovementDetectorService extends IntentService	 {
     }
 
     private void vibrate() {
-        if (MainActivity.getBoolPreference(this, "vibrate")) {
+        if (MainActivity.getBoolPreference(this, "vibrate", false)) {
             Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
             long[] pattern = {0, 250, 250, 250, 250, 250, 250, 250, 250};
             if (v != null) {

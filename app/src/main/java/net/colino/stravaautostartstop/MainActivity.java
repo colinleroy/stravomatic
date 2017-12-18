@@ -217,8 +217,8 @@ public class MainActivity extends PreferenceActivity  {
     }
 
     public static boolean shouldServiceRun(Context c) {
-        boolean bike_detection = MainActivity.getBoolPreference(c, "enable_bike_detection");
-        boolean run_detection = MainActivity.getBoolPreference(c, "enable_run_detection");
+        boolean bike_detection = MainActivity.getBoolPreference(c, "enable_bike_detection", true);
+        boolean run_detection = MainActivity.getBoolPreference(c, "enable_run_detection", true);
 
         return bike_detection || run_detection;
     }
@@ -237,8 +237,8 @@ public class MainActivity extends PreferenceActivity  {
         }
         return -1;
     }
-    public static boolean getBoolPreference(Context c, String key) {
+    public static boolean getBoolPreference(Context c, String key, boolean def) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-        return prefs.getBoolean(key, false);
+        return prefs.getBoolean(key, def);
     }
 }
