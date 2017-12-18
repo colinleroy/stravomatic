@@ -33,7 +33,7 @@ public class MovementDetectorService extends IntentService	 {
     private boolean isTimeoutReached() {
         long now = System.currentTimeMillis();
 
-        long timeout = MainActivity.getIntPreference(this, "stop_timeout") * 60;
+        long timeout = MainActivity.getIntPreference(this, "_stop_timeout");
         return ((now - startedAt) / 1000) > timeout;
     }
 
@@ -43,7 +43,7 @@ public class MovementDetectorService extends IntentService	 {
         boolean bicycling = false;
         boolean running = false;
 
-        int threshold = MainActivity.getPercentPreference(this, "detection_threshold");
+        int threshold = MainActivity.getIntPreference(this, "_detection_threshold");
 
         for (DetectedActivity result : probableActivities) {
             Log.i(MainActivity.LOG_TAG, getType(result.getType()) +"\t" + result.getConfidence());

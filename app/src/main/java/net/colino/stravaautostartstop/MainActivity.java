@@ -51,7 +51,7 @@ public class MainActivity extends PreferenceActivity  {
                     if (key.equals("enable_bike_detection") || key.equals("enable_run_detection")) {
                         setupAlarm(mContext);
                     }
-                    if (key.equals("detection_interval") || key.equals("detection_threshold")) {
+                    if (key.equals("_detection_interval") || key.equals("_detection_threshold")) {
                         LogUtils.i(MainActivity.LOG_TAG, "Updating detection parameters");
                         rescheduleAlarm(mContext);
                     }
@@ -120,6 +120,8 @@ public class MainActivity extends PreferenceActivity  {
                 pi);
     }
 
+    private static boolean serviceStarted = false;
+
     public static void startService(Context context) {
         Intent i = new Intent(context, ForegroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -127,10 +129,12 @@ public class MainActivity extends PreferenceActivity  {
         } else {
             context.startService(i);
         }
+        serviceStarted = true;
     }
 
     public static void stopService(Context context) {
         context.stopService(new Intent(context, ForegroundService.class));
+        serviceStarted = false;
     }
 
     private static void cancelAlarm(Context context, AlarmManager mgr, PendingIntent pi) {
@@ -149,7 +153,8 @@ public class MainActivity extends PreferenceActivity  {
     }
 
     private static void rescheduleAlarm(Context context) {
-        if (!MainActivity.shouldServiceRun(context)) {
+        if (!MainActivity.shouldServiceRun(context) || !serviceStarted) {
+            LogUtils.i(LOG_TAG, "no need to reschedule");
             return;
         }
         AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -187,9 +192,10 @@ public class MainActivity extends PreferenceActivity  {
         PendingIntent updatesIntent = PendingIntent.getService( context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
         if (start) {
-            int interval = MainActivity.getIntPreference(context, "detection_interval");
-            LogUtils.i(MainActivity.LOG_TAG, "requesting updates every " + interval +" minutes");
-            activityRecognitionClient.requestActivityUpdates(interval * 60 * 1000, updatesIntent);
+            int interval = MainActivity.getIntPreference(context, "_detection_interval");
+            int threshold = MainActivity.getIntPreference(context, "_detection_threshold");
+            LogUtils.i(MainActivity.LOG_TAG, "requesting updates every " + interval +" seconds with " + threshold + " fiability threshold");
+            activityRecognitionClient.requestActivityUpdates(interval * 1000, updatesIntent);
         } else {
             LogUtils.i(LOG_TAG, "Stop requesting updates");
             activityRecognitionClient.removeActivityUpdates(updatesIntent);
@@ -235,17 +241,4 @@ public class MainActivity extends PreferenceActivity  {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         return prefs.getBoolean(key, false);
     }
-    public static int getPercentPreference(Context c, String key) {
-        String s = getStringPreference(c, key);
-        if (s.indexOf('%') > -1) {
-            s = s.substring(0, s.indexOf('%'));
-        }
-        try {
-            return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            LogUtils.e(LOG_TAG, "can't parse " + s + " to int");
-        }
-        return -1;
-    }
-
 }

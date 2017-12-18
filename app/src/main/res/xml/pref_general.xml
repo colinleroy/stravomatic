@@ -13,28 +13,28 @@
         android:summary="@string/pref_summary_enable_run_detection"
         android:title="@string/pref_title_enable_run_detection" />
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="60"
         android:entries="@array/detection_interval_entries"
-        android:entryValues="@array/detection_interval_entries"
-        android:key="detection_interval"
+        android:entryValues="@array/detection_interval_values"
+        android:key="_detection_interval"
         android:summary="@string/pref_summary_detection_interval"
         android:title="@string/pref_title_detection_interval" />
     <ListPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:defaultValue="15"
+        android:defaultValue="900"
         android:entries="@array/stop_timeout_entries"
-        android:entryValues="@array/stop_timeout_entries"
-        android:key="stop_timeout"
+        android:entryValues="@array/stop_timeout_values"
+        android:key="_stop_timeout"
         android:summary="@string/pref_summary_stop_timeout"
         android:title="@string/pref_title_stop_timeout" />
     <ListPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:defaultValue="75%"
+        android:defaultValue="75"
         android:entries="@array/detection_threshold_entries"
-        android:entryValues="@array/detection_threshold_entries"
-        android:key="detection_threshold"
+        android:entryValues="@array/detection_threshold_values"
+        android:key="_detection_threshold"
         android:summary="@string/pref_summary_detection_threshold"
         android:title="@string/pref_title_detection_threshold" />
     <SwitchPreference
