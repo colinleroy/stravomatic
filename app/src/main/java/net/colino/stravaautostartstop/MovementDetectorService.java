@@ -4,6 +4,7 @@ import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
 import android.app.IntentService;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,7 +46,7 @@ public class MovementDetectorService extends IntentService	 {
         int threshold = MainActivity.getIntPreference(this, "_detection_threshold");
 
         for (DetectedActivity result : probableActivities) {
-            LogUtils.i(MainActivity.LOG_TAG, getType(result.getType()) +"\t" + result.getConfidence());
+            LogUtils.i(MainActivity.LOG_TAG, getType(result.getType()) +" (confidence: " + result.getConfidence() + ")");
             if( result.getConfidence() >= threshold ) {
                 switch(result.getType()) {
                     case DetectedActivity.ON_BICYCLE:
@@ -135,23 +136,35 @@ public class MovementDetectorService extends IntentService	 {
     }
 
     private void sendStartIntent(String type){
-        Intent i = new Intent(Intent.ACTION_RUN);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.setData(Uri.parse("http://strava.com/nfc/record"));
-        i.putExtra("rideType", type);
-        i.putExtra("show_activity",false);
-        startActivity(i);
+        try {
+            Intent i = new Intent(Intent.ACTION_RUN);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setData(Uri.parse("http://strava.com/nfc/record"));
+            i.putExtra("rideType", type);
+            i.putExtra("show_activity", false);
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
+        }
         LogUtils.i(MainActivity.LOG_TAG, "sent start intent " + type);
         vibrate();
+
+        MainActivity.requestUpdates(this, 120, true);
     }
 
     private void sendStopIntent(){
-        Intent i = new Intent(Intent.ACTION_RUN);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.setData(Uri.parse("http://strava.com/nfc/record/stop"));
-        i.putExtra("show_activity",false);
-        startActivity(i);
+        try {
+            Intent i = new Intent(Intent.ACTION_RUN);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setData(Uri.parse("http://strava.com/nfc/record/stop"));
+            i.putExtra("show_activity",false);
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
+        }
         LogUtils.i(MainActivity.LOG_TAG, "sent stop intent");
         vibrate();
+
+        MainActivity.requestUpdates(this, 0, true);
     }
 }

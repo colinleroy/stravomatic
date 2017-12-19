@@ -141,7 +141,7 @@ public class MainActivity extends PreferenceActivity  {
         /* cancel alarm */
         mgr.cancel(pi);
         /* stop updates */
-        MainActivity.requestUpdates(context,false);
+        MainActivity.requestUpdates(context, 0, false);
         /* stop service */
         MainActivity.stopService(context);
 
@@ -186,14 +186,17 @@ public class MainActivity extends PreferenceActivity  {
         return nBuilder.build();
     }
 
-    public static void requestUpdates(Context context, boolean start) {
+    public static void requestUpdates(Context context, int interval, boolean start) {
         ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(context);
         Intent intent = new Intent( context, MovementDetectorService.class );
         PendingIntent updatesIntent = PendingIntent.getService( context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
         if (start) {
-            int interval = MainActivity.getIntPreference(context, "_detection_interval");
             int threshold = MainActivity.getIntPreference(context, "_detection_threshold");
+            if (interval <= 0) {
+                /* use default interval */
+                interval = MainActivity.getIntPreference(context, "_detection_interval");
+            }
             LogUtils.i(MainActivity.LOG_TAG, "requesting updates every " + interval +" seconds with " + threshold + " fiability threshold");
             activityRecognitionClient.requestActivityUpdates(interval * 1000, updatesIntent);
         } else {
