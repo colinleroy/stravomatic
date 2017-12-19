@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Stravauto</string>
+    <string name="app_name">Stravomatic</string>
     <string name="pref_title_enable_bike_detection">Bicycling detection</string>
     <string name="pref_summary_enable_bike_detection">Automatically start Strava activities if bicycling is detected</string>
     <string name="pref_title_enable_run_detection">Running detection</string>

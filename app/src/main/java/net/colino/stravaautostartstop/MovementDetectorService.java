@@ -149,11 +149,7 @@ public class MovementDetectorService extends IntentService	 {
         LogUtils.i(MainActivity.LOG_TAG, "sent start intent " + type);
         vibrate();
 
-        int interval = MainActivity.getIntPreference(this, "_detection_interval");
-        if (interval < 120) {
-            /* Don't ask to often while we're moving */
-            MainActivity.requestUpdates(this, 120, true);
-        }
+        MainActivity.setActivityStarted(this,true);
     }
 
     private void sendStopIntent(){
@@ -169,6 +165,6 @@ public class MovementDetectorService extends IntentService	 {
         LogUtils.i(MainActivity.LOG_TAG, "sent stop intent");
         vibrate();
 
-        MainActivity.requestUpdates(this, 0, true);
+        MainActivity.setActivityStarted(this,false);
     }
 }

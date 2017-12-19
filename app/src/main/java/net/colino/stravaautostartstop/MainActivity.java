@@ -141,7 +141,7 @@ public class MainActivity extends PreferenceActivity  {
         /* cancel alarm */
         mgr.cancel(pi);
         /* stop updates */
-        MainActivity.requestUpdates(context, 0, false);
+        MainActivity.requestUpdates(context, false);
         /* stop service */
         MainActivity.stopService(context);
 
@@ -186,16 +186,16 @@ public class MainActivity extends PreferenceActivity  {
         return nBuilder.build();
     }
 
-    public static void requestUpdates(Context context, int interval, boolean start) {
+    public static void requestUpdates(Context context, boolean start) {
         ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(context);
         Intent intent = new Intent( context, MovementDetectorService.class );
         PendingIntent updatesIntent = PendingIntent.getService( context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
 
         if (start) {
             int threshold = MainActivity.getIntPreference(context, "_detection_threshold");
-            if (interval <= 0) {
-                /* use default interval */
-                interval = MainActivity.getIntPreference(context, "_detection_interval");
+            int interval = MainActivity.getIntPreference(context, "_detection_interval");
+            if (interval < 120 && activityStarted) {
+                interval = 120;
             }
             LogUtils.i(MainActivity.LOG_TAG, "requesting updates every " + interval +" seconds with " + threshold + " fiability threshold");
             activityRecognitionClient.requestActivityUpdates(interval * 1000, updatesIntent);
@@ -243,5 +243,12 @@ public class MainActivity extends PreferenceActivity  {
     public static boolean getBoolPreference(Context c, String key, boolean def) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         return prefs.getBoolean(key, def);
+    }
+
+    private static boolean activityStarted = false;
+
+    public static void setActivityStarted(Context context, boolean started) {
+        activityStarted = started;
+        MainActivity.requestUpdates(context, true);
     }
 }

@@ -30,14 +30,14 @@ public class ForegroundService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         LogUtils.i(MainActivity.LOG_TAG, "startForegroundService");
         startForeground(1, MainActivity.buildNotification(this, getString(R.string.detection_started)));
-        MainActivity.requestUpdates(this, 0,true);
+        MainActivity.requestUpdates(this,true);
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         LogUtils.i(MainActivity.LOG_TAG, "destroyForegroundService");
-        MainActivity.requestUpdates(this, 0,false);
+        MainActivity.requestUpdates(this,false);
         super.onDestroy();
     }
 

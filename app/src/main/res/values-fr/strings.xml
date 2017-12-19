@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Stravauto</string>
+    <string name="app_name">Stravomatic</string>
     <string name="pref_title_detection_interval">Intervalle de détection</string>
     <string name="pref_title_enable_bike_detection">Détection vélo</string>
     <string name="pref_title_enable_run_detection">Détection course</string>
