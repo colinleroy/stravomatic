@@ -53,7 +53,12 @@ public class ForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         LogUtils.i(MainActivity.LOG_TAG, "startForegroundService");
-        startForeground(1, MainActivity.buildNotification(this.getApplicationContext(), getString(R.string.detection_started)));
+        String label = getString(R.string.detection_started);
+        String details = MainActivity.getNotificationDetails(this.getApplicationContext());
+        if (details != null) {
+            details = label + "\n" + details;
+        }
+        startForeground(1, MainActivity.buildNotification(this.getApplicationContext(), label, details));
         requestUpdates(this.getApplicationContext(),true);
         return START_STICKY;
     }

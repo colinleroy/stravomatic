@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
@@ -170,7 +171,7 @@ public class MainActivity extends PreferenceActivity  {
         scheduleAlarm(context, mgr, pi);
     }
 
-    public static Notification buildNotification(Context context, String text) {
+    public static Notification buildNotification(Context context, String text, String bigText) {
         NotificationCompat.Builder nBuilder;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -188,6 +189,9 @@ public class MainActivity extends PreferenceActivity  {
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
                 .setTimeoutAfter(10 * 1000);
+        if (bigText != null) {
+            nBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
+        }
 
         return nBuilder.build();
     }
@@ -228,6 +232,43 @@ public class MainActivity extends PreferenceActivity  {
             LogUtils.e(MainActivity.LOG_TAG, "Error converting '"+s+"' to integer");
         }
         return -1;
+    }
+
+    public static String getNotificationDetails(Context c) {
+        String[] intervalValues = c.getResources().getStringArray(R.array.detection_interval_values);
+        String[] thresholdValues = c.getResources().getStringArray(R.array.detection_threshold_values);
+        String[] intervalEntries = c.getResources().getStringArray(R.array.detection_interval_entries);
+        String[] thresholdEntries = c.getResources().getStringArray(R.array.detection_threshold_entries);
+        String intervalValue = getStringPreference(c, "_detection_interval");
+        String thresholdValue = getStringPreference(c, "_detection_threshold");
+        int intervalIndex = -1;
+        int thresholdIndex = -1;
+        int i = 0;
+
+        for (String s: intervalValues) {
+            if (s.equals(intervalValue)) {
+                intervalIndex = i;
+                break;
+            }
+            i++;
+        }
+
+        i = 0;
+        for (String s: thresholdValues) {
+            if (s.equals(thresholdValue)) {
+                thresholdIndex = i;
+                break;
+            }
+            i++;
+        }
+        if (intervalIndex != -1 && thresholdIndex != -1
+         && intervalIndex < intervalEntries.length
+         && thresholdIndex < thresholdEntries.length) {
+            return String.format(c.getString(R.string.notification_details),
+                    intervalEntries[intervalIndex],
+                    thresholdEntries[thresholdIndex]);
+        }
+        return null;
     }
 
     public static boolean getBoolPreference(Context c, String key, boolean def) {
