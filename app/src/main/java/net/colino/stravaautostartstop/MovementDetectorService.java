@@ -149,7 +149,7 @@ public class MovementDetectorService extends IntentService	 {
         LogUtils.i(MainActivity.LOG_TAG, "sent start intent " + type);
         vibrate();
 
-        MainActivity.setActivityStarted(this,true);
+        MainActivity.setActivityStarted(true);
     }
 
     private void sendStopIntent(){
@@ -165,6 +165,6 @@ public class MovementDetectorService extends IntentService	 {
         LogUtils.i(MainActivity.LOG_TAG, "sent stop intent");
         vibrate();
 
-        MainActivity.setActivityStarted(this,false);
+        MainActivity.setActivityStarted(false);
     }
 }

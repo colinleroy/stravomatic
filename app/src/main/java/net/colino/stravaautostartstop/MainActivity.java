@@ -247,8 +247,7 @@ public class MainActivity extends PreferenceActivity  {
 
     private static boolean activityStarted = false;
 
-    public static void setActivityStarted(Context context, boolean started) {
+    public static void setActivityStarted(boolean started) {
         activityStarted = started;
-        MainActivity.requestUpdates(context, true);
     }
 }
