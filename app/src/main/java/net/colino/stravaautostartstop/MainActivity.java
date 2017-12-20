@@ -24,7 +24,7 @@ public class MainActivity extends PreferenceActivity  {
 
     public static String LOG_TAG = MainActivity.class.getPackage().getName();
 
-    private static MainActivity mContext;
+    private ForegroundService foregroundService;
 
     private AppCompatDelegate mDelegate;
 
@@ -44,19 +44,20 @@ public class MainActivity extends PreferenceActivity  {
         SharedPreferences.OnSharedPreferenceChangeListener listener;
 
         private void addPreferencesListener(){
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
             listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
                 public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                     if (key.equals("enable_bike_detection") || key.equals("enable_run_detection")) {
-                        setupAlarm(mContext);
+                        setupAlarm(MyPreferenceFragment.this.getActivity().getApplicationContext());
                     }
                     if (key.equals("_detection_interval") || key.equals("_detection_threshold")) {
                         LogUtils.i(MainActivity.LOG_TAG, "Updating detection parameters");
-                        rescheduleAlarm(mContext);
+                        rescheduleAlarm(MyPreferenceFragment.this.getActivity().getApplicationContext());
                     }
                 }
             };
+            LogUtils.i(LOG_TAG, "register prefs change listener");
             prefs.registerOnSharedPreferenceChangeListener(listener);
         }
 
@@ -68,15 +69,22 @@ public class MainActivity extends PreferenceActivity  {
 
             addPreferencesListener();
         }
+
+        @Override
+        public void onDestroy()
+        {
+            super.onDestroy();
+            LogUtils.i(LOG_TAG, "unregister prefs change listener");
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
+            prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mContext = this;
-
-        setupAlarm(this);
+        setupAlarm(this.getApplicationContext());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -123,7 +131,7 @@ public class MainActivity extends PreferenceActivity  {
     private static boolean serviceStarted = false;
 
     public static void startService(Context context) {
-        Intent i = new Intent(context, ForegroundService.class);
+        Intent i = new Intent(context.getApplicationContext(), ForegroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(i);
         } else {
@@ -133,15 +141,13 @@ public class MainActivity extends PreferenceActivity  {
     }
 
     public static void stopService(Context context) {
-        context.stopService(new Intent(context, ForegroundService.class));
+        context.stopService(new Intent(context.getApplicationContext(), ForegroundService.class));
         serviceStarted = false;
     }
 
     private static void cancelAlarm(Context context, AlarmManager mgr, PendingIntent pi) {
         /* cancel alarm */
         mgr.cancel(pi);
-        /* stop updates */
-        MainActivity.requestUpdates(context, false);
         /* stop service */
         MainActivity.stopService(context);
 
@@ -186,33 +192,16 @@ public class MainActivity extends PreferenceActivity  {
         return nBuilder.build();
     }
 
-    public static void requestUpdates(Context context, boolean start) {
-        ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(context);
-        Intent intent = new Intent( context, MovementDetectorService.class );
-        PendingIntent updatesIntent = PendingIntent.getService( context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT );
-
-        if (start) {
-            int threshold = MainActivity.getIntPreference(context, "_detection_threshold");
-            int interval = MainActivity.getIntPreference(context, "_detection_interval");
-            if (interval < 120 && activityStarted) {
-                interval = 120;
-            }
-            LogUtils.i(MainActivity.LOG_TAG, "requesting updates every " + interval +" seconds with " + threshold + " fiability threshold");
-            activityRecognitionClient.requestActivityUpdates(interval * 1000, updatesIntent);
-        } else {
-            LogUtils.i(LOG_TAG, "Stop requesting updates");
-            activityRecognitionClient.removeActivityUpdates(updatesIntent);
-        }
-    }
-
     /* start alarm - avoids the service being killed in the background. */
     public static void setupAlarm(Context context) {
         AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent pi = getAlarmPendingIntent(context);
 
         if (MainActivity.shouldServiceRun(context)) {
-            LogUtils.i(MainActivity.LOG_TAG, "setting alarm up");
-            scheduleAlarm(context, mgr, pi);
+            if(!serviceStarted) {
+                LogUtils.i(MainActivity.LOG_TAG, "setting alarm up");
+                scheduleAlarm(context, mgr, pi);
+            }
         } else {
             LogUtils.i(MainActivity.LOG_TAG, "setting alarm down");
             cancelAlarm(context, mgr, pi);
@@ -240,6 +229,7 @@ public class MainActivity extends PreferenceActivity  {
         }
         return -1;
     }
+
     public static boolean getBoolPreference(Context c, String key, boolean def) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         return prefs.getBoolean(key, def);
@@ -249,5 +239,9 @@ public class MainActivity extends PreferenceActivity  {
 
     public static void setActivityStarted(boolean started) {
         activityStarted = started;
+    }
+
+    public static boolean isActivityStarted() {
+        return activityStarted;
     }
 }

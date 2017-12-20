@@ -33,7 +33,7 @@ public class MovementDetectorService extends IntentService	 {
     private boolean isTimeoutReached() {
         long now = System.currentTimeMillis();
 
-        long timeout = MainActivity.getIntPreference(this, "_stop_timeout");
+        long timeout = MainActivity.getIntPreference(this.getApplicationContext(), "_stop_timeout");
         return ((now - startedAt) / 1000) > timeout;
     }
 
@@ -43,7 +43,7 @@ public class MovementDetectorService extends IntentService	 {
         boolean bicycling = false;
         boolean running = false;
 
-        int threshold = MainActivity.getIntPreference(this, "_detection_threshold");
+        int threshold = MainActivity.getIntPreference(this.getApplicationContext(), "_detection_threshold");
 
         for (DetectedActivity result : probableActivities) {
             LogUtils.i(MainActivity.LOG_TAG, getType(result.getType()) +" (confidence: " + result.getConfidence() + ")");
@@ -70,10 +70,10 @@ public class MovementDetectorService extends IntentService	 {
         }
 
         String status;
-        if (bicycling && MainActivity.getBoolPreference(this, "enable_bike_detection", true)) {
+        if (bicycling && MainActivity.getBoolPreference(this.getApplicationContext(), "enable_bike_detection", true)) {
             shouldStart = true;
             status = "Bicycling : ";
-        } else if (running && MainActivity.getBoolPreference(this, "enable_run_detection", true)) {
+        } else if (running && MainActivity.getBoolPreference(this.getApplicationContext(), "enable_run_detection", true)) {
             shouldStart = true;
             status = "Running : ";
         } else {
@@ -105,7 +105,7 @@ public class MovementDetectorService extends IntentService	 {
     }
 
     private void vibrate() {
-        if (MainActivity.getBoolPreference(this, "vibrate", false)) {
+        if (MainActivity.getBoolPreference(this.getApplicationContext(), "vibrate", false)) {
             Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
             long[] pattern = {0, 250, 250, 250, 250, 250, 250, 250, 250};
             if (v != null) {
