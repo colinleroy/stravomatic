@@ -15,6 +15,8 @@ import java.util.List;
 public class MovementDetectorService extends IntentService	 {
 
     private static boolean activityStarted = false;
+    private static boolean bicyclingStarted = false;
+    private static boolean runningStarted = false;
 
     private static long startedAt = 0;
 
@@ -61,6 +63,10 @@ public class MovementDetectorService extends IntentService	 {
                         break;
                     case DetectedActivity.WALKING:
                     case DetectedActivity.ON_FOOT:
+                        if (bicyclingStarted) {
+                            shouldStop = true;
+                        } /* else don't change anything. */
+                        break;
                     case DetectedActivity.UNKNOWN:
                     case DetectedActivity.TILTING:
                         /* Don't change anything for those */
@@ -82,11 +88,15 @@ public class MovementDetectorService extends IntentService	 {
 
         if (shouldStart) {
             if (!activityStarted) {
+                String activity = (bicycling ? "Ride" : "Run");
                 /* start activity */
-                status += "starting activity";
+                status += "starting activity: " + activity;
 
                 activityStarted = true;
-                sendStartIntent(bicycling ? "Ride" : "Run");
+                bicyclingStarted = bicycling;
+                runningStarted = running;
+
+                sendStartIntent(activity);
             }
             /* refresh start time */
             startedAt = System.currentTimeMillis();
@@ -96,6 +106,9 @@ public class MovementDetectorService extends IntentService	 {
                 status += " stopping activity";
                 sendStopIntent();
                 activityStarted = false;
+                bicyclingStarted = false;
+                runningStarted = false;
+
             } else {
                 LogUtils.i(MainActivity.LOG_TAG, "not stopping : timeout not reached");
             }
