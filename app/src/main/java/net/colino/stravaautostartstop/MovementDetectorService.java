@@ -52,26 +52,31 @@ public class MovementDetectorService extends IntentService	 {
 
         switch(currentMovement) {
             case DetectedActivity.ON_BICYCLE:
-                details = "Bicycling since " + timeSinceLastMovement;
+                details = String.format(this.getApplicationContext().getString(R.string.movement_bicycling),
+                            timeSinceLastMovement);
                 break;
             case DetectedActivity.RUNNING:
-                details = "Running since " + timeSinceLastMovement;
+                details = String.format(this.getApplicationContext().getString(R.string.movement_running),
+                        timeSinceLastMovement);
                 break;
             case DetectedActivity.IN_VEHICLE:
-                details = "In vehicle since " + timeSinceLastMovement;
+                details = String.format(this.getApplicationContext().getString(R.string.movement_in_vehicle),
+                        timeSinceLastMovement);
                 break;
             case DetectedActivity.STILL:
-                details = "Still since " + timeSinceLastMovement;
+                details = String.format(this.getApplicationContext().getString(R.string.movement_still),
+                        timeSinceLastMovement);
                 break;
             case DetectedActivity.WALKING:
-                details = "Walking since " + timeSinceLastMovement;
+                details = String.format(this.getApplicationContext().getString(R.string.movement_walking),
+                        timeSinceLastMovement);
                 break;
             case DetectedActivity.ON_FOOT:
-                details = "On foot since " + timeSinceLastMovement;
+                details = String.format(this.getApplicationContext().getString(R.string.movement_on_foot),
+                        timeSinceLastMovement);
                 break;
             case DetectedActivity.UNKNOWN:
             case DetectedActivity.TILTING:
-                break;
             default:
                 details = null;
         }

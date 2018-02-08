@@ -22,5 +22,5 @@
     <string name="movement_in_vehicle">Dans un véhicule depuis %s</string>
     <string name="movement_still">Immobile depuis %s</string>
     <string name="movement_walking">En marche depuis %s</string>
-    <string name="movement_on_foot">À pieds depuis %s</string>
+    <string name="movement_on_foot">À pied depuis %s</string>
 </resources>
