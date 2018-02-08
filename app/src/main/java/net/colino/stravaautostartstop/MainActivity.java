@@ -171,8 +171,47 @@ public class MainActivity extends PreferenceActivity  {
         scheduleAlarm(context, mgr, pi);
     }
 
+    public static void updateNotification(Context context, String text, String bigText) {
+        String label = text;
+        String details = null;
+
+        if (!MainActivity.shouldServiceRun(context)) {
+            return;
+        }
+
+        if (text == null) {
+            label = context.getString(R.string.detection_started);
+        } else {
+            label = text;
+        }
+
+        if (bigText != null) {
+            details = label + "\n" + bigText;
+        }
+
+        Notification n = buildNotification(context, label, details);
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.notify(1, n);
+        }
+    }
+
     public static Notification buildNotification(Context context, String text, String bigText) {
         NotificationCompat.Builder nBuilder;
+
+        String label = context.getString(R.string.detection_started);
+        String details = getNotificationDetails(context.getApplicationContext());
+
+        if (details != null) {
+            details = label + "\n" + details;
+        }
+
+        if (text == null && bigText == null) {
+            text = label;
+            bigText = details;
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             nBuilder = new NotificationCompat.Builder(context, "sass_channel");

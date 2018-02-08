@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Vibrator;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MovementDetectorService extends IntentService	 {
@@ -18,6 +20,9 @@ public class MovementDetectorService extends IntentService	 {
     private static boolean bicyclingStarted = false;
     private static boolean runningStarted = false;
 
+    private static int currentMovement = -1;
+    private static long lastMovementChange = 0;
+    private static long triggerAt = 0;
     private static long startedAt = 0;
 
     public MovementDetectorService() {
@@ -39,11 +44,56 @@ public class MovementDetectorService extends IntentService	 {
         return ((now - startedAt) / 1000) > timeout;
     }
 
+    private void setupNotification(boolean stravaTriggerOK) {
+        String details = "";
+        String label = "";
+
+        String timeSinceLastMovement = DateFormat.getTimeInstance().format(new Date(lastMovementChange));
+
+        switch(currentMovement) {
+            case DetectedActivity.ON_BICYCLE:
+                details = "Bicycling since " + timeSinceLastMovement;
+                break;
+            case DetectedActivity.RUNNING:
+                details = "Running since " + timeSinceLastMovement;
+                break;
+            case DetectedActivity.IN_VEHICLE:
+                details = "In vehicle since " + timeSinceLastMovement;
+                break;
+            case DetectedActivity.STILL:
+                details = "Still since " + timeSinceLastMovement;
+                break;
+            case DetectedActivity.WALKING:
+                details = "Walking since " + timeSinceLastMovement;
+                break;
+            case DetectedActivity.ON_FOOT:
+                details = "On foot since " + timeSinceLastMovement;
+                break;
+            case DetectedActivity.UNKNOWN:
+            case DetectedActivity.TILTING:
+                break;
+            default:
+                details = null;
+        }
+        if (activityStarted) {
+           label = String.format(this.getApplicationContext().getString(R.string.strava_started_at),
+                                    DateFormat.getTimeInstance().format(new Date(triggerAt)));
+        } else if (!stravaTriggerOK){
+            label = this.getApplicationContext().getString(R.string.strava_not_found);
+        } else {
+            label = null;
+        }
+
+        MainActivity.updateNotification(this.getApplicationContext(), label, details);
+    }
+
     private void handleDetectedActivities(List<DetectedActivity> probableActivities) {
         boolean shouldStart = false;
         boolean shouldStop = false;
         boolean bicycling = false;
         boolean running = false;
+        boolean updateNotification = false;
+        boolean stravaTriggerOK = true;
 
         int threshold = MainActivity.getIntPreference(this.getApplicationContext(), "_detection_threshold");
 
@@ -72,6 +122,14 @@ public class MovementDetectorService extends IntentService	 {
                         /* Don't change anything for those */
                         break;
                 }
+
+                if (result.getType() != currentMovement) {
+                    lastMovementChange = System.currentTimeMillis();
+                    currentMovement = result.getType();
+                    updateNotification = true;
+                }
+
+                break;
             }
         }
 
@@ -92,11 +150,19 @@ public class MovementDetectorService extends IntentService	 {
                 /* start activity */
                 status += "starting activity: " + activity;
 
-                activityStarted = true;
-                bicyclingStarted = bicycling;
-                runningStarted = running;
+                updateNotification = true;
+                try {
+                    sendStartIntent(activity);
+                    triggerAt = System.currentTimeMillis();
+                    activityStarted = true;
+                    bicyclingStarted = bicycling;
+                    runningStarted = running;
 
-                sendStartIntent(activity);
+                } catch (ActivityNotFoundException e) {
+                    LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
+                    stravaTriggerOK = false;
+                }
+
             }
             /* refresh start time */
             startedAt = System.currentTimeMillis();
@@ -104,17 +170,27 @@ public class MovementDetectorService extends IntentService	 {
             /* stop activity */
             if (isTimeoutReached()) {
                 status += " stopping activity";
-                sendStopIntent();
+                try {
+                    sendStopIntent();
+                } catch (ActivityNotFoundException e) {
+                    LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
+                    stravaTriggerOK = false;
+                }
                 activityStarted = false;
                 bicyclingStarted = false;
                 runningStarted = false;
-
+                triggerAt = 0;
+                updateNotification = true;
             } else {
                 LogUtils.i(MainActivity.LOG_TAG, "not stopping : timeout not reached");
             }
         }
 
         LogUtils.i(MainActivity.LOG_TAG, "currently: " + status + " (detection threshold " + threshold+")");
+
+        if (updateNotification) {
+            setupNotification(stravaTriggerOK);
+        }
     }
 
     private void vibrate() {
@@ -148,33 +224,25 @@ public class MovementDetectorService extends IntentService	 {
             return "";
     }
 
-    private void sendStartIntent(String type){
-        try {
-            Intent i = new Intent(Intent.ACTION_RUN);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.setData(Uri.parse("http://strava.com/nfc/record"));
-            i.putExtra("rideType", type);
-            i.putExtra("show_activity", false);
-            startActivity(i);
-        } catch (ActivityNotFoundException e) {
-            LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
-        }
+    private void sendStartIntent(String type) throws ActivityNotFoundException {
+        Intent i = new Intent(Intent.ACTION_RUN);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.setData(Uri.parse("http://strava.com/nfc/record"));
+        i.putExtra("rideType", type);
+        i.putExtra("show_activity", false);
+        startActivity(i);
         LogUtils.i(MainActivity.LOG_TAG, "sent start intent " + type);
         vibrate();
 
         MainActivity.setActivityStarted(true);
     }
 
-    private void sendStopIntent(){
-        try {
-            Intent i = new Intent(Intent.ACTION_RUN);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.setData(Uri.parse("http://strava.com/nfc/record/stop"));
-            i.putExtra("show_activity",false);
-            startActivity(i);
-        } catch (ActivityNotFoundException e) {
-            LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
-        }
+    private void sendStopIntent() throws ActivityNotFoundException {
+        Intent i = new Intent(Intent.ACTION_RUN);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.setData(Uri.parse("http://strava.com/nfc/record/stop"));
+        i.putExtra("show_activity",false);
+        startActivity(i);
         LogUtils.i(MainActivity.LOG_TAG, "sent stop intent");
         vibrate();
 

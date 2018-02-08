@@ -14,4 +14,12 @@
     <string name="pref_summary_vibrate">Vibrate when starting or stopping Strava</string>
     <string name="detection_started">Detection enabled</string>
     <string name="notification_details">(every %s, %s fiability)</string>
+    <string name="strava_started_at">Strava started at %s</string>
+    <string name="strava_not_found">Could not start Strava</string>
+    <string name="movement_bicycling">Bicycling since %s</string>
+    <string name="movement_running">Running since %s</string>
+    <string name="movement_in_vehicle">In vehicle since %s</string>
+    <string name="movement_still">Still since %s</string>
+    <string name="movement_walking">Walking since %s</string>
+    <string name="movement_on_foot">On foot since %s</string>
 </resources>

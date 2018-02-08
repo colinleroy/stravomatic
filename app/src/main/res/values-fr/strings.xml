@@ -15,4 +15,12 @@
     <string name="pref_title_detection_threshold">Fiabilité de détection</string>
     <string name="pref_summary_detection_threshold">Démarrer une activité si la détection est fiable à plus de %s</string>
     <string name="notification_details">(toutes les %s, %s fiabilité)</string>
+    <string name="strava_started_at">Strava démarré à %s</string>
+    <string name="strava_not_found">Démarrage de Strava impossible</string>
+    <string name="movement_bicycling">À vélo depuis %s</string>
+    <string name="movement_running">En course depuis %s</string>
+    <string name="movement_in_vehicle">Dans un véhicule depuis %s</string>
+    <string name="movement_still">Immobile depuis %s</string>
+    <string name="movement_walking">En marche depuis %s</string>
+    <string name="movement_on_foot">À pieds depuis %s</string>
 </resources>
