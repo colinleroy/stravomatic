@@ -21,7 +21,7 @@ public class MovementDetectorService extends IntentService	 {
     private static boolean runningStarted = false;
 
     private static int currentMovement = -1;
-    private static long lastMovementChange = 0;
+    private static long lastMovementChange = System.currentTimeMillis();
     private static long triggerAt = 0;
     private static long startedAt = 0;
 
@@ -45,41 +45,44 @@ public class MovementDetectorService extends IntentService	 {
     }
 
     private void setupNotification(boolean stravaTriggerOK) {
-        String details = "";
-        String label = "";
+        String details = null;
+        String label = null;
 
         String timeSinceLastMovement = DateFormat.getTimeInstance().format(new Date(lastMovementChange));
 
-        switch(currentMovement) {
-            case DetectedActivity.ON_BICYCLE:
-                details = String.format(this.getApplicationContext().getString(R.string.movement_bicycling),
+        if ((System.currentTimeMillis() - lastMovementChange) / 1000 < MainActivity.getIntPreference(this.getApplicationContext(), "_stop_timeout")) {
+            switch (currentMovement) {
+                case DetectedActivity.ON_BICYCLE:
+                    details = String.format(this.getApplicationContext().getString(R.string.movement_bicycling),
                             timeSinceLastMovement);
-                break;
-            case DetectedActivity.RUNNING:
-                details = String.format(this.getApplicationContext().getString(R.string.movement_running),
-                        timeSinceLastMovement);
-                break;
-            case DetectedActivity.IN_VEHICLE:
-                details = String.format(this.getApplicationContext().getString(R.string.movement_in_vehicle),
-                        timeSinceLastMovement);
-                break;
-            case DetectedActivity.STILL:
-                details = String.format(this.getApplicationContext().getString(R.string.movement_still),
-                        timeSinceLastMovement);
-                break;
-            case DetectedActivity.WALKING:
-                details = String.format(this.getApplicationContext().getString(R.string.movement_walking),
-                        timeSinceLastMovement);
-                break;
-            case DetectedActivity.ON_FOOT:
-                details = String.format(this.getApplicationContext().getString(R.string.movement_on_foot),
-                        timeSinceLastMovement);
-                break;
-            case DetectedActivity.UNKNOWN:
-            case DetectedActivity.TILTING:
-            default:
-                details = null;
+                    break;
+                case DetectedActivity.RUNNING:
+                    details = String.format(this.getApplicationContext().getString(R.string.movement_running),
+                            timeSinceLastMovement);
+                    break;
+                case DetectedActivity.IN_VEHICLE:
+                    details = String.format(this.getApplicationContext().getString(R.string.movement_in_vehicle),
+                            timeSinceLastMovement);
+                    break;
+                case DetectedActivity.STILL:
+                    details = String.format(this.getApplicationContext().getString(R.string.movement_still),
+                            timeSinceLastMovement);
+                    break;
+                case DetectedActivity.WALKING:
+                    details = String.format(this.getApplicationContext().getString(R.string.movement_walking),
+                            timeSinceLastMovement);
+                    break;
+                case DetectedActivity.ON_FOOT:
+                    details = String.format(this.getApplicationContext().getString(R.string.movement_on_foot),
+                            timeSinceLastMovement);
+                    break;
+                case DetectedActivity.UNKNOWN:
+                case DetectedActivity.TILTING:
+                default:
+                    details = null;
+            }
         }
+
         if (activityStarted) {
            label = String.format(this.getApplicationContext().getString(R.string.strava_started_at),
                                     DateFormat.getTimeInstance().format(new Date(triggerAt)));
@@ -131,6 +134,8 @@ public class MovementDetectorService extends IntentService	 {
                 if (result.getType() != currentMovement) {
                     lastMovementChange = System.currentTimeMillis();
                     currentMovement = result.getType();
+                    updateNotification = true;
+                } else if ((System.currentTimeMillis() - lastMovementChange) / 1000 > MainActivity.getIntPreference(this.getApplicationContext(), "_stop_timeout")) {
                     updateNotification = true;
                 }
 

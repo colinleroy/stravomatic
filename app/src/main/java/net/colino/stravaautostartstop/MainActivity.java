@@ -172,24 +172,11 @@ public class MainActivity extends PreferenceActivity  {
     }
 
     public static void updateNotification(Context context, String text, String bigText) {
-        String label = text;
-        String details = null;
-
         if (!MainActivity.shouldServiceRun(context)) {
             return;
         }
 
-        if (text == null) {
-            label = context.getString(R.string.detection_started);
-        } else {
-            label = text;
-        }
-
-        if (bigText != null) {
-            details = label + "\n" + bigText;
-        }
-
-        Notification n = buildNotification(context, label, details);
+        Notification n = buildNotification(context, text, bigText);
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -204,14 +191,17 @@ public class MainActivity extends PreferenceActivity  {
         String label = context.getString(R.string.detection_started);
         String details = getNotificationDetails(context.getApplicationContext());
 
-        if (details != null) {
-            details = label + "\n" + details;
+        if (text == null) {
+            text = label;
         }
 
-        if (text == null && bigText == null) {
-            text = label;
-            bigText = details;
+        if (bigText != null) {
+            details = text + "\n" + bigText;
+        } else {
+            details = text + "\n" + details;
         }
+
+        bigText = details;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             nBuilder = new NotificationCompat.Builder(context, "sass_channel");
