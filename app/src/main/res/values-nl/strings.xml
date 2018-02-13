@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><resources>
+    <string name="app_name">Stravomatic</string>
+    <string name="pref_title_enable_bike_detection">Fietsdetectie</string>
+    <string name="pref_summary_enable_bike_detection">Strava-activiteiten automatisch starten als fietsen wordt gedetecteerd.</string>
+    <string name="pref_title_enable_run_detection">Hardloopdetectie</string>
+    <string name="pref_summary_enable_run_detection">Strava-activiteiten automatisch starten als hardlopen wordt gedetecteerd.</string>
+    <string name="pref_title_detection_interval">Detectie-interval</string>
+    <string name="pref_summary_detection_interval">Elke %s controleren op bewegingen.</string>
+    <string name="pref_title_stop_timeout">Time-out stoppen activiteit</string>
+    <string name="pref_summary_stop_timeout">Stop activiteiten van Strava na %s zonder enige beweging.</string>
+    <string name="pref_title_detection_threshold">Detectiedrempel</string>
+    <string name="pref_summary_detection_threshold">Activiteiten starten als het detecteren meer dan %s accuraat is.</string>
+    <string name="pref_title_vibrate">Trillen</string>
+    <string name="pref_summary_vibrate">Trillen als Strava wordt gestart of gestopt.</string>
+    <string name="detection_started">Detecteren ingeschakeld</string>
+    <string name="notification_details">(elke %s, %s betrouwbaarheid)</string>
+    <string name="strava_started_at">Strava begon om %s</string>
+    <string name="strava_not_found">Het is niet gelukt Strava te starten</string>
+    <string name="movement_bicycling">Er wordt gefietst sinds %s</string>
+    <string name="movement_running">Er wordt hard gelopen sinds %s</string>
+    <string name="movement_in_vehicle">In het voertuig sinds %s</string>
+    <string name="movement_still">Stilstand sinds %s</string>
+    <string name="movement_walking">Er wordt gelopen sinds %s</string>
+    <string name="movement_on_foot">Te voet sinds %s</string>
+</resources>
