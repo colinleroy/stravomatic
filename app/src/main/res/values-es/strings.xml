@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Stravomatic</string>
+    <string name="pref_title_detection_interval">Intervalo de detección</string>
+    <string name="pref_title_enable_bike_detection">Detección ciclismo</string>
+    <string name="pref_title_enable_run_detection">Detección carrera a pie</string>
+    <string name="pref_title_stop_timeout">Plazo de interrupción de actividad</string>
+    <string name="pref_title_vibrate">Vibración</string>
+    <string name="pref_summary_vibrate">Vibrar al iniciar y parar Strava</string>
+    <string name="pref_summary_stop_timeout">Parar Strava después de %s sin movimiento</string>
+    <string name="pref_summary_enable_run_detection">Iniciar Strava automáticamente para carreras a pie</string>
+    <string name="pref_summary_enable_bike_detection">Iniciar Strava automáticamente para salidas a bicicleta</string>
+    <string name="pref_summary_detection_interval">Comprobar movimiento cada %s</string>
+    <string name="detection_started">Detección activa</string>
+    <string name="pref_title_detection_threshold">Fiabilidad de detección</string>
+    <string name="pref_summary_detection_threshold">Iniciar una actividad cuando la detección es fiable a más de %s</string>
+    <string name="notification_details">(cada %s, %s fiabilidad)</string>
+    <string name="strava_started_at">Strava inicio a/en %s</string>
+    <string name="strava_not_found">Imposible iniciar Strava</string>
+    <string name="movement_bicycling">En bicicleta desde %s</string>
+    <string name="movement_running">Corriendo desde %s</string>
+    <string name="movement_in_vehicle">En un vehículo desde %s</string>
+    <string name="movement_still">Inmóvil desde %s</string>
+    <string name="movement_walking">Caminando desde %s</string>
+    <string name="movement_on_foot">A pie desde %s</string>
+</resources>
