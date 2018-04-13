@@ -12,7 +12,7 @@ android {
         applicationId "net.colino.stravaautostartstop"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 11
+        versionCode 12
         versionName "2.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -33,7 +33,7 @@ android {
             signingConfig signingConfigs.standard
             targetSdkVersion 26
             testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-            versionCode 11
+            versionCode 12
             versionName '2.5'
             dimension 'standard'
         }
