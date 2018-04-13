@@ -171,12 +171,22 @@ public class MainActivity extends PreferenceActivity  {
         scheduleAlarm(context, mgr, pi);
     }
 
-    public static void updateNotification(Context context, String text, String bigText) {
+    public static void updateNotification(Context context, String text, String bigText, boolean addStopIntent) {
+        NotificationCompat.Action action = null;
         if (!MainActivity.shouldServiceRun(context)) {
             return;
         }
 
-        Notification n = buildNotification(context, text, bigText);
+        if (addStopIntent) {
+            Intent stopStravaIntent = new Intent(context, MovementDetectorService.class);
+            stopStravaIntent.setAction("net.colino.stravaautostartstop.stop_strava");
+            PendingIntent pendingIntent = PendingIntent.getService(context, 100, stopStravaIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            action = new
+                    NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel,
+                                context.getString(R.string.stop_strava_now), pendingIntent);
+        }
+
+        Notification n = buildNotification(context, text, bigText, action);
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -185,7 +195,7 @@ public class MainActivity extends PreferenceActivity  {
         }
     }
 
-    public static Notification buildNotification(Context context, String text, String bigText) {
+    public static Notification buildNotification(Context context, String text, String bigText, NotificationCompat.Action action) {
         NotificationCompat.Builder nBuilder;
 
         String label = context.getString(R.string.detection_started);
@@ -220,6 +230,9 @@ public class MainActivity extends PreferenceActivity  {
                 .setTimeoutAfter(10 * 1000);
         if (bigText != null) {
             nBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
+        }
+        if (action != null) {
+            nBuilder.addAction(action);
         }
 
         return nBuilder.build();

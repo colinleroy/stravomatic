@@ -22,4 +22,5 @@
     <string name="movement_still">Stilstand sinds %s</string>
     <string name="movement_walking">Er wordt gelopen sinds %s</string>
     <string name="movement_on_foot">Te voet sinds %s</string>
+    <string name="stop_strava_now">Stop Strava</string>
 </resources>

@@ -31,9 +31,15 @@ public class MovementDetectorService extends IntentService	 {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        LogUtils.d(MainActivity.LOG_TAG, "Intent is "+intent.getAction());
+        if (intent.getAction() != null && intent.getAction().equals("net.colino.stravaautostartstop.stop_strava")) {
+            handleDetectedActivities(null, true);
+            return;
+        }
+
         if(ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            handleDetectedActivities( result.getProbableActivities() );
+            handleDetectedActivities( result.getProbableActivities(), false );
         }
     }
 
@@ -92,10 +98,10 @@ public class MovementDetectorService extends IntentService	 {
             label = null;
         }
 
-        MainActivity.updateNotification(this.getApplicationContext(), label, details);
+        MainActivity.updateNotification(this.getApplicationContext(), label, details, activityStarted && stravaTriggerOK);
     }
 
-    private void handleDetectedActivities(List<DetectedActivity> probableActivities) {
+    private void handleDetectedActivities(List<DetectedActivity> probableActivities, boolean forceStop) {
         boolean shouldStart = false;
         boolean shouldStop = false;
         boolean bicycling = false;
@@ -105,44 +111,50 @@ public class MovementDetectorService extends IntentService	 {
 
         int threshold = MainActivity.getIntPreference(this.getApplicationContext(), "_detection_threshold");
 
-        for (DetectedActivity result : probableActivities) {
-            LogUtils.i(MainActivity.LOG_TAG, getType(result.getType()) +" (confidence: " + result.getConfidence() + ")");
-            if( result.getConfidence() >= threshold ) {
-                switch(result.getType()) {
-                    case DetectedActivity.ON_BICYCLE:
-                        bicycling = true;
-                        break;
-                    case DetectedActivity.RUNNING:
-                        running = true;
-                        break;
-                    case DetectedActivity.IN_VEHICLE:
-                    case DetectedActivity.STILL:
-                        shouldStop = true;
-                        break;
-                    case DetectedActivity.WALKING:
-                    case DetectedActivity.ON_FOOT:
-                        if (bicyclingStarted) {
+        if (probableActivities != null) {
+            for (DetectedActivity result : probableActivities) {
+                LogUtils.i(MainActivity.LOG_TAG, getType(result.getType()) + " (confidence: " + result.getConfidence() + ")");
+                if (result.getConfidence() >= threshold) {
+                    switch (result.getType()) {
+                        case DetectedActivity.ON_BICYCLE:
+                            bicycling = true;
+                            break;
+                        case DetectedActivity.RUNNING:
+                            running = true;
+                            break;
+                        case DetectedActivity.IN_VEHICLE:
+                        case DetectedActivity.STILL:
                             shouldStop = true;
-                        } /* else don't change anything. */
-                        break;
-                    case DetectedActivity.UNKNOWN:
-                    case DetectedActivity.TILTING:
-                        /* Don't change anything for those */
-                        break;
-                }
+                            break;
+                        case DetectedActivity.WALKING:
+                        case DetectedActivity.ON_FOOT:
+                            if (bicyclingStarted) {
+                                shouldStop = true;
+                            } /* else don't change anything. */
+                            break;
+                        case DetectedActivity.UNKNOWN:
+                        case DetectedActivity.TILTING:
+                            /* Don't change anything for those */
+                            break;
+                    }
 
-                if (result.getType() != currentMovement) {
-                    lastMovementChange = System.currentTimeMillis();
-                    currentMovement = result.getType();
-                    updateNotification = true;
-                } else if ((System.currentTimeMillis() - lastMovementChange) / 1000 > MainActivity.getIntPreference(this.getApplicationContext(), "_stop_timeout")) {
-                    updateNotification = true;
-                }
+                    if (result.getType() != currentMovement) {
+                        lastMovementChange = System.currentTimeMillis();
+                        currentMovement = result.getType();
+                        updateNotification = true;
+                    } else if ((System.currentTimeMillis() - lastMovementChange) / 1000 > MainActivity.getIntPreference(this.getApplicationContext(), "_stop_timeout")) {
+                        updateNotification = true;
+                    }
 
-                break;
+                    break;
+                }
             }
+        } else if (forceStop) {
+            shouldStop = true;
+            startedAt = 0;
+        } else {
+            LogUtils.e(MainActivity.LOG_TAG, "Wrong calling of handleDetectedActivities");
         }
-
         String status;
         if (bicycling && MainActivity.getBoolPreference(this.getApplicationContext(), "enable_bike_detection", true)) {
             shouldStart = true;
