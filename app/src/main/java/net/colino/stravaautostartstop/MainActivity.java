@@ -25,8 +25,6 @@ public class MainActivity extends PreferenceActivity  {
 
     public static String LOG_TAG = MainActivity.class.getPackage().getName();
 
-    private ForegroundService foregroundService;
-
     private AppCompatDelegate mDelegate;
 
     private AppCompatDelegate getDelegate() {

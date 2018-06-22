@@ -248,10 +248,10 @@ public class MovementDetectorService extends IntentService	 {
 
     private void sendStartIntent(String type) throws ActivityNotFoundException {
         Intent i = new Intent(Intent.ACTION_RUN);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                 | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.setData(Uri.parse("http://strava.com/nfc/record"));
         i.putExtra("rideType", type);
-        i.putExtra("show_activity", false);
         startActivity(i);
         LogUtils.i(MainActivity.LOG_TAG, "sent start intent " + type);
         vibrate();
@@ -261,9 +261,9 @@ public class MovementDetectorService extends IntentService	 {
 
     private void sendStopIntent() throws ActivityNotFoundException {
         Intent i = new Intent(Intent.ACTION_RUN);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.setData(Uri.parse("http://strava.com/nfc/record/stop"));
-        i.putExtra("show_activity",false);
         startActivity(i);
         LogUtils.i(MainActivity.LOG_TAG, "sent stop intent");
         vibrate();
