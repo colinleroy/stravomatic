@@ -23,4 +23,5 @@
     <string name="movement_walking">Walking since %s</string>
     <string name="movement_on_foot">On foot since %s</string>
     <string name="stop_strava_now">Stop Strava now</string>
+    <string name="pref_title_show_activity">Show Strava when starting</string>
 </resources>
