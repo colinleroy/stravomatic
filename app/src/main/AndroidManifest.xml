@@ -30,9 +30,10 @@
                 <action android:name="android.intent.action.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".OnAlarmReceiver"/>
+
         <service android:name=".MovementDetectorService"/>
-        <service android:name=".ForegroundService"/>
+        <service android:name=".ForegroundService"
+            android:stopWithTask="false"/>
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
     </application>
 </manifest>

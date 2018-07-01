@@ -9,6 +9,6 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         LogUtils.i(MainActivity.LOG_TAG, "Got broadcast : "+intent.getAction());
-        MainActivity.setupAlarm(context);
+        MainActivity.setupService(context, false);
     }
 }

@@ -1,6 +1,5 @@
 package net.colino.stravaautostartstop;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,17 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatDelegate;
-
-import com.google.android.gms.location.ActivityRecognition;
-import com.google.android.gms.location.ActivityRecognitionClient;
 
 public class MainActivity extends PreferenceActivity  {
 
@@ -48,11 +42,12 @@ public class MainActivity extends PreferenceActivity  {
 
                 public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                     if (key.equals("enable_bike_detection") || key.equals("enable_run_detection")) {
-                        setupAlarm(MyPreferenceFragment.this.getActivity().getApplicationContext());
+                        LogUtils.i(MainActivity.LOG_TAG, "Handling service change");
+                        setupService(MyPreferenceFragment.this.getActivity().getApplicationContext(), false);
                     }
                     if (key.equals("_detection_interval") || key.equals("_detection_threshold")) {
                         LogUtils.i(MainActivity.LOG_TAG, "Updating detection parameters");
-                        rescheduleAlarm(MyPreferenceFragment.this.getActivity().getApplicationContext());
+                        setupService(MyPreferenceFragment.this.getActivity().getApplicationContext(), true);
                     }
                 }
             };
@@ -83,7 +78,7 @@ public class MainActivity extends PreferenceActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setupAlarm(this.getApplicationContext());
+        setupService(this.getApplicationContext(), false);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -111,25 +106,12 @@ public class MainActivity extends PreferenceActivity  {
         }
     }
 
-    private static PendingIntent getAlarmPendingIntent(Context context) {
-        Intent i = new Intent(context, OnAlarmReceiver.class);
-        return PendingIntent.getBroadcast(context, 0, i, 0);
-    }
-
-    private static void scheduleAlarm(Context context, AlarmManager mgr, PendingIntent pi) {
-        /* start service */
-        startService(context);
-
-        /* setup alarm */
-        mgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + 1000,
-                10 * 60 * 1000,
-                pi);
-    }
-
     private static boolean serviceStarted = false;
 
     public static void startService(Context context) {
+        if (serviceStarted || !MainActivity.shouldServiceRun(context)) {
+            return;
+        }
         Intent i = new Intent(context.getApplicationContext(), ForegroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(i);
@@ -139,34 +121,20 @@ public class MainActivity extends PreferenceActivity  {
         serviceStarted = true;
     }
 
-    public static void stopService(Context context) {
+    private static void stopService(Context context) {
+        /* stop service */
+        if (!serviceStarted) {
+            return;
+        }
+
         context.stopService(new Intent(context.getApplicationContext(), ForegroundService.class));
         serviceStarted = false;
-    }
-
-    private static void cancelAlarm(Context context, AlarmManager mgr, PendingIntent pi) {
-        /* cancel alarm */
-        mgr.cancel(pi);
-        /* stop service */
-        MainActivity.stopService(context);
 
         NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
             notificationManager.cancel(1);
         }
-    }
-
-    private static void rescheduleAlarm(Context context) {
-        if (!MainActivity.shouldServiceRun(context) || !serviceStarted) {
-            LogUtils.i(LOG_TAG, "no need to reschedule");
-            return;
-        }
-        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pi = getAlarmPendingIntent(context);
-
-        cancelAlarm(context, mgr, pi);
-        scheduleAlarm(context, mgr, pi);
     }
 
     public static void updateNotification(Context context, String text, String bigText, boolean addStopIntent) {
@@ -225,10 +193,9 @@ public class MainActivity extends PreferenceActivity  {
                 .setSmallIcon(R.drawable.ic_status_icon)
                 .setContentIntent(contentIntent)
                 .setAutoCancel(true)
-                .setTimeoutAfter(10 * 1000);
-        if (bigText != null) {
-            nBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
-        }
+                .setTimeoutAfter(10 * 1000)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
+
         if (action != null) {
             nBuilder.addAction(action);
         }
@@ -237,18 +204,19 @@ public class MainActivity extends PreferenceActivity  {
     }
 
     /* start alarm - avoids the service being killed in the background. */
-    public static void setupAlarm(Context context) {
-        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pi = getAlarmPendingIntent(context);
-
+    public static void setupService(Context context, boolean updateParameters) {
         if (MainActivity.shouldServiceRun(context)) {
-            if(!serviceStarted) {
-                LogUtils.i(MainActivity.LOG_TAG, "setting alarm up");
-                scheduleAlarm(context, mgr, pi);
+            if (serviceStarted && updateParameters) {
+                LogUtils.i(MainActivity.LOG_TAG, "restarting service");
+                stopService(context);
             }
-        } else {
-            LogUtils.i(MainActivity.LOG_TAG, "setting alarm down");
-            cancelAlarm(context, mgr, pi);
+            if(!serviceStarted) {
+                LogUtils.i(MainActivity.LOG_TAG, "setting service up");
+                startService(context);
+            }
+        } else if (serviceStarted) {
+            LogUtils.i(MainActivity.LOG_TAG, "setting service down");
+            stopService(context);
         }
     }
 

@@ -18,7 +18,6 @@ public class MovementDetectorService extends IntentService	 {
 
     private static boolean activityStarted = false;
     private static boolean bicyclingStarted = false;
-    private static boolean runningStarted = false;
 
     private static int currentMovement = -1;
     private static long lastMovementChange = System.currentTimeMillis();
@@ -52,7 +51,7 @@ public class MovementDetectorService extends IntentService	 {
 
     private void setupNotification(boolean stravaTriggerOK) {
         String details = null;
-        String label = null;
+        String label;
 
         String timeSinceLastMovement = DateFormat.getTimeInstance().format(new Date(lastMovementChange));
 
@@ -178,7 +177,6 @@ public class MovementDetectorService extends IntentService	 {
                     triggerAt = System.currentTimeMillis();
                     activityStarted = true;
                     bicyclingStarted = bicycling;
-                    runningStarted = running;
 
                 } catch (ActivityNotFoundException e) {
                     LogUtils.e(MainActivity.LOG_TAG, "Strava not found");
@@ -200,7 +198,6 @@ public class MovementDetectorService extends IntentService	 {
                 }
                 activityStarted = false;
                 bicyclingStarted = false;
-                runningStarted = false;
                 triggerAt = 0;
                 updateNotification = true;
             } else {
