@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
         android:defaultValue="true"
@@ -48,4 +49,8 @@
         android:key="switch_preference_1"
         android:summary="@string/pref_summary_vibrate"
         android:title="@string/pref_title_vibrate" />
+    <Preference
+        android:key="battery_whitelist_button"
+        android:summary="@string/pref_summary_battery_whitelist"
+        android:title="@string/pref_title_battery_whitelist" />
 </PreferenceScreen>

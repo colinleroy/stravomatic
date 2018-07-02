@@ -12,6 +12,8 @@
     <string name="pref_summary_detection_threshold">Start activity if the detection is more than %s accurate</string>
     <string name="pref_title_vibrate">Vibration</string>
     <string name="pref_summary_vibrate">Vibrate when starting or stopping Strava</string>
+    <string name="pref_title_battery_whitelist">Battery usage</string>
+    <string name="pref_summary_battery_whitelist">Stravomatic works better when exempted from battery optimisation. Click here to whitelist it.</string>
     <string name="detection_started">Detection enabled</string>
     <string name="notification_details">(every %s, %s fiability)</string>
     <string name="strava_started_at">Strava started at %s</string>

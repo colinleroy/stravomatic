@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
@@ -36,7 +39,7 @@ public class MainActivity extends PreferenceActivity  {
     {
         SharedPreferences.OnSharedPreferenceChangeListener listener;
 
-        private void addPreferencesListener(){
+        private void addPreferencesListener() {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity().getApplicationContext());
             listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
@@ -53,6 +56,23 @@ public class MainActivity extends PreferenceActivity  {
             };
             LogUtils.i(LOG_TAG, "register prefs change listener");
             prefs.registerOnSharedPreferenceChangeListener(listener);
+
+            Preference batteryWhitelistButton = findPreference("battery_whitelist_button");
+
+            PowerManager pm = (PowerManager) this.getActivity().getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(this.getActivity().getApplicationContext().getPackageName())) {
+                batteryWhitelistButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        Intent whiteListIntent = new Intent();
+                        whiteListIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                        startActivity(whiteListIntent);
+                        return true;
+                    }
+                });
+            } else {
+                getPreferenceScreen().removePreference(batteryWhitelistButton);
+            }
         }
 
         @Override
@@ -149,7 +169,7 @@ public class MainActivity extends PreferenceActivity  {
             PendingIntent pendingIntent = PendingIntent.getService(context, 100, stopStravaIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             action = new
                     NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel,
-                                context.getString(R.string.stop_strava_now), pendingIntent);
+                    context.getString(R.string.stop_strava_now), pendingIntent);
         }
 
         Notification n = buildNotification(context, text, bigText, action);

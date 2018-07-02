@@ -14,6 +14,8 @@
     <string name="detection_started">Detección activa</string>
     <string name="pref_title_detection_threshold">Fiabilidad de detección</string>
     <string name="pref_summary_detection_threshold">Iniciar una actividad cuando la detección es fiable a más de %s</string>
+    <string name="pref_title_battery_whitelist">Battery usage</string>
+    <string name="pref_summary_battery_whitelist">Stravomatic works better when exempted from battery optimisation. Click here to whitelist it.</string>
     <string name="notification_details">(cada %s, %s fiabilidad)</string>
     <string name="strava_started_at">Strava inicio a/en %s</string>
     <string name="strava_not_found">Imposible iniciar Strava</string>
