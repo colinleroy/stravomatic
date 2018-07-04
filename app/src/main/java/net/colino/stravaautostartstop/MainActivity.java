@@ -59,19 +59,21 @@ public class MainActivity extends PreferenceActivity  {
 
             Preference batteryWhitelistButton = findPreference("battery_whitelist_button");
 
-            PowerManager pm = (PowerManager) this.getActivity().getApplicationContext().getSystemService(Context.POWER_SERVICE);
-            if (!pm.isIgnoringBatteryOptimizations(this.getActivity().getApplicationContext().getPackageName())) {
-                batteryWhitelistButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        Intent whiteListIntent = new Intent();
-                        whiteListIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                        startActivity(whiteListIntent);
-                        return true;
-                    }
-                });
-            } else {
-                getPreferenceScreen().removePreference(batteryWhitelistButton);
+            if (batteryWhitelistButton != null) {
+                PowerManager pm = (PowerManager) this.getActivity().getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                if (!pm.isIgnoringBatteryOptimizations(this.getActivity().getApplicationContext().getPackageName())) {
+                    batteryWhitelistButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent whiteListIntent = new Intent();
+                            whiteListIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                            startActivity(whiteListIntent);
+                            return true;
+                        }
+                    });
+                } else {
+                    getPreferenceScreen().removePreference(batteryWhitelistButton);
+                }
             }
         }
 
