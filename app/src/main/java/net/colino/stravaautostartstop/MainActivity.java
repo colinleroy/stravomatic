@@ -1,5 +1,6 @@
 package net.colino.stravaautostartstop;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -130,10 +132,23 @@ public class MainActivity extends PreferenceActivity  {
 
     private static boolean serviceStarted = false;
 
+    private static PendingIntent getAlarmPendingIntent(Context context) {
+        Intent i = new Intent(context, OnAlarmReceiver.class);
+        return PendingIntent.getBroadcast(context, 0, i, 0);
+    }
+
     public static void startService(Context context) {
         if (serviceStarted || !MainActivity.shouldServiceRun(context)) {
             return;
         }
+
+        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = getAlarmPendingIntent(context);
+        mgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + (60 * 60 * 1000),
+                60 * 60 * 1000,
+                pi);
+
         Intent i = new Intent(context.getApplicationContext(), ForegroundService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(i);
@@ -148,6 +163,10 @@ public class MainActivity extends PreferenceActivity  {
         if (!serviceStarted) {
             return;
         }
+
+        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = getAlarmPendingIntent(context);
+        mgr.cancel(pi);
 
         context.stopService(new Intent(context.getApplicationContext(), ForegroundService.class));
         serviceStarted = false;
@@ -225,7 +244,6 @@ public class MainActivity extends PreferenceActivity  {
         return nBuilder.build();
     }
 
-    /* start alarm - avoids the service being killed in the background. */
     public static void setupService(Context context, boolean updateParameters) {
         if (MainActivity.shouldServiceRun(context)) {
             if (serviceStarted && updateParameters) {
@@ -236,9 +254,11 @@ public class MainActivity extends PreferenceActivity  {
                 LogUtils.i(MainActivity.LOG_TAG, "setting service up");
                 startService(context);
             }
-        } else if (serviceStarted) {
-            LogUtils.i(MainActivity.LOG_TAG, "setting service down");
-            stopService(context);
+        } else {
+            if (serviceStarted) {
+                LogUtils.i(MainActivity.LOG_TAG, "setting service down");
+                stopService(context);
+            }
         }
     }
 

@@ -30,6 +30,7 @@
                 <action android:name="android.intent.action.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".OnAlarmReceiver"/>
 
         <service android:name=".MovementDetectorService"/>
         <service android:name=".ForegroundService"
