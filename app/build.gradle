@@ -7,13 +7,13 @@ android {
             storeFile file('/home/colin/Android/keystore.jks')
         }
     }
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         applicationId "net.colino.stravaautostartstop"
         minSdkVersion 23
-        targetSdkVersion 26
-        versionCode 17
-        versionName "3.0"
+        targetSdkVersion 28
+        versionCode 19
+        versionName "3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.standard
@@ -31,10 +31,10 @@ android {
             minSdkVersion 23
             applicationId 'net.colino.stravaautostartstop'
             signingConfig signingConfigs.standard
-            targetSdkVersion 26
+            targetSdkVersion 28
             testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-            versionCode 17
-            versionName '3.0'
+            versionCode 19
+            versionName '3.1'
             dimension 'standard'
         }
     }

@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -77,6 +78,37 @@ public class MainActivity extends PreferenceActivity  {
                     getPreferenceScreen().removePreference(batteryWhitelistButton);
                 }
             }
+
+            Preference systemModal = findPreference("system_modal");
+
+            if (systemModal != null) {
+                if (Build.VERSION.SDK_INT > 28 && !Settings.canDrawOverlays(this.getActivity())) {
+                    systemModal.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                    Uri.parse("package:" + "net.colino.stravaautostartstop"));
+                            startActivityForResult(intent, 1);
+                            return true;
+                        }
+                    });
+                } else {
+                    getPreferenceScreen().removePreference(systemModal);
+                }
+            }
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode,  Intent data) {
+            switch (requestCode) {
+                case 1: {
+                    // Check if the app get the permission
+                    if (Settings.canDrawOverlays(this.getActivity())) {
+                        Preference batteryModal = findPreference("system_modal");
+                        getPreferenceScreen().removePreference(batteryModal);
+                    }
+                }
+            }
         }
 
         @Override
@@ -110,6 +142,7 @@ public class MainActivity extends PreferenceActivity  {
             actionBar.setDisplayShowCustomEnabled(true);
         }
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+
     }
 
         /**
