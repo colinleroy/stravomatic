@@ -26,4 +26,6 @@
     <string name="movement_on_foot">Te voet sinds %s</string>
     <string name="stop_strava_now">Stop Strava</string>
     <string name="pref_title_show_activity">Laat Strava zien wanneer je start</string>
+    <string name="pref_title_system_modal">Allow overlay</string>
+    <string name="pref_summary_system_modal">Stravomatic needs the overlay permission to be able to start Strava. Click here to grant it.</string>
 </resources>

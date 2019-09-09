@@ -28,4 +28,7 @@
 
     <string name="pref_title_battery_whitelist">Uso de la batería</string>
     <string name="pref_summary_battery_whitelist">Stravomatic funciona mejor exento de la optimisacion de la batería. Haz clic aquí para añadir a la lista blanca.</string>
+
+    <string name="pref_title_system_modal">Allow overlay</string>
+    <string name="pref_summary_system_modal">Stravomatic needs the overlay permission to be able to start Strava. Click here to grant it.</string>
 </resources>

@@ -27,4 +27,7 @@
     <string name="movement_on_foot">À pied depuis %s</string>
     <string name="stop_strava_now">Arrêter Strava</string>
     <string name="pref_title_show_activity">Afficher Strava au démarrage</string>
+
+    <string name="pref_title_system_modal">Permettre l\'overlay</string>
+    <string name="pref_summary_system_modal">Stravomatic utilise l\'overlay pour démarrer Strava. Cliquez ici pour l\'accepter.</string>
 </resources>
