@@ -24,6 +24,9 @@ public class MovementDetectorService extends IntentService	 {
     private static long triggerAt = 0;
     private static long startedAt = 0;
 
+    private static boolean debug = false;
+    private static long serviceStartedAt = System.currentTimeMillis();
+
     public MovementDetectorService() {
         super("MovementDetectorService");
     }
@@ -153,6 +156,10 @@ public class MovementDetectorService extends IntentService	 {
             startedAt = 0;
         } else {
             LogUtils.e(MainActivity.LOG_TAG, "Wrong calling of handleDetectedActivities");
+        }
+
+        if (debug && (System.currentTimeMillis() - serviceStartedAt) > 30000) {
+            bicycling = true;
         }
         String status;
         if (bicycling && MainActivity.getBoolPreference(this.getApplicationContext(), "enable_bike_detection", true)) {
